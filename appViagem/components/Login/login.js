@@ -1,12 +1,12 @@
-import  React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet, View, Text, Image, SafeAreaView, TouchableOpacity
 } from 'react-native';
 import { TextInput } from 'react-native-paper';
-import firebase from '../../services/connectinFirebase';
+import firebase from '../../services/connectioFirebase';
 
 
-export default function Login({changeStatus}) {
+export default function Login({ changeStatus }) {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -14,36 +14,36 @@ export default function Login({changeStatus}) {
 
   //método handleLogin para verificar se é login ou cadastrar
 
-  function handleLogin(){
-    if(type === 'login'){
+  function handleLogin() {
+    if (type === 'login') {
       // Aqui fazemos o login
       const user = firebase.auth().signInWithEmailAndPassword(email, password)
-      .then((user) => {
-        changeStatus(user.user.uid)
-      })
-      .catch((err)=>{
-        console.log(err);
-        alert('Email ou senha não cadastrados!');
-        return;
-      })   
-    }else{
-     // Aqui cadastramos o usuario
-     const user = firebase.auth().createUserWithEmailAndPassword(email, password)
-     .then((user)=>{
-       changeStatus(user.user.uid)
-     })
-     .catch((err)=>{
-      console.log(err);
-      alert('Erro ao Cadastrar!');
-      return;
-     })
+        .then((user) => {
+          changeStatus(user.user.uid)
+        })
+        .catch((err) => {
+          console.log(err);
+          alert('Email ou senha não cadastrados!');
+          return;
+        })
+    } else {
+      // Aqui cadastramos o usuario
+      const user = firebase.auth().createUserWithEmailAndPassword(email, password)
+        .then((user) => {
+          changeStatus(user.user.uid)
+        })
+        .catch((err) => {
+          console.log(err);
+          alert('Erro ao Cadastrar!');
+          return;
+        })
     }
   }
 
   return (
     <View style={styles.container}>
       <Image source={require('../../assets/usuario.png')}
-        style={{ width: 340, height: 340, marginLeft: 30,  marginRight: 30}}></Image>
+        style={{ width: 340, height: 340, marginLeft: 30, marginRight: 30 }}></Image>
       <SafeAreaView>
         <TextInput
           label="Email"
@@ -64,9 +64,9 @@ export default function Login({changeStatus}) {
       <TouchableOpacity
         style={[styles.handleLogin,
         { backgroundColor: type === 'login' ? '#4682B4' : '#141414' }]}
-        onPress={'handleLogin'}
+        onPress={handleLogin}
       >
-        
+
         <Text style={styles.loginText}>
           {type === 'login' ? 'Acessar' : 'Cadastrar'}
         </Text>
@@ -95,6 +95,16 @@ const styles = StyleSheet.create({
     padding: 10,
     borderWidth: 1,
     borderColor: '#141414'
+  },
+  handleLogin: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 50,
+    marginTop: 30,
+  },
+  loginText: {
+    color: '#FFF',
+    fontSize: 24,
   },
 
 
