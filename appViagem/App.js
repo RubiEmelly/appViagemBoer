@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Login from '../appViagem/components/Login/login'
-
+import Menu from './components/Menu/menutabs'
  
 
 export default function App() {
@@ -13,4 +13,6 @@ export default function App() {
   if (!user) {
     return <Login changeStatus={(user) => setUser(user)} />
   }
+
+  return <Menu/>
 }
