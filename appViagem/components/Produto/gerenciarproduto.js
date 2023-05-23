@@ -1,6 +1,7 @@
-import {View, Text, StyleSheet,TouchableOpacity, Keyboard, FlatList, ActivityIndicator} from 'react-native';
+import {View, Text, StyleSheet, Button, TouchableOpacity, Keyboard, FlatList, ActivityIndicator} from 'react-native';
 import { TextInput } from 'react-native-paper';
 import React, { useState, useEffect, useRef } from 'react'; 
+import firebase from '../../services/connectioFirebase';
 
 const Separator = () => { 
     return <View style={styles.separator} />; 
@@ -8,49 +9,104 @@ const Separator = () => {
 
 export default function GerenciarProduto() {
 
-    const [passagem, setPassagem] = useState('');
-    const [destinoInicial, setDestinoInicial] = useState('');
-    const [destinoFinal, setDestinoFinal] = useState('');
-    const [valor, setValor] = useState('');
+    const [nome, setNome] = useState('');
+    const [marca, setMarca] = useState('');
+    const [preco, setPreco] = useState('');
+    const [cor, setCor] = useState('');
     const [key, setKey] = useState('');
+
+
+//implementação dos métodos update ou insert 
+
+async function insertUpdate() { 
+    //editar dados 
+    if (
+       (nome !== '') & 
+       (marca !== '') & 
+       (preco !== '') & 
+       (cor !== '') & 
+       (key !== '') 
+     ) { 
+      firebase.database().ref('produtos').child(key).update({ 
+        nome: nome, 
+        marca: marca, 
+        preco: preco, 
+        cor: cor 
+      }); 
+      Keyboard.dismiss(); 
+      alert('Produto Editado!'); 
+      clearFields(); 
+      setKey(""); 
+      return; 
+    } 
+
+    //cadastrar dados 
+    let produtos = await firebase.database().ref('produtos'); 
+    let chave = produtos.push().key; //comando para salvar é o push 
+    produtos.child(chave).set({ 
+      nome: nome, 
+      marca: marca, 
+      preco: preco, 
+      cor:cor,
+    }); 
+
+    Keyboard.dismiss(); 
+    alert('Produto Cadastrado!'); 
+    clearFields(); 
+  } 
+
+//método para limpar os campos com valores
+function clearFields(){
+    setNome('');
+    setMarca('');
+    setPreco('');
+    setCor('');
+}
 
     return (
 
         <View style={styles.container}>
          <Separator/>           
             <TextInput
-                placeholder='Passagem Aérea'
+                placeholder='Produto'
                 left={<TextInput.Icon icon="ticket-account" />}
                 maxLength={40}
                 style={styles.input}
-                onChangeText={(text) => setPassagem(text)}
-                value={passagem}
+                onChangeText={(text) => setNome(text)}
+                value={nome}
             />
         <Separator/>
             <TextInput
-                placeholder='Destino Inicial'
-                left={<TextInput.Icon icon="airplane-search" />}
+                placeholder='Marca'
+                left={<TextInput.Icon icon="sale" />}
                 style={styles.input}
-                onChangeText={(text) => setDestinoInicial(text)}
-                value={destinoInicial}
-            />
-        <Separator/>
-            <TextInput
-                placeholder='Destino Final'
-                left={<TextInput.Icon icon="airplane-marker" />}
-                style={styles.input}
-                onChangeText={(text) => setDestinoFinal(text)}
-                value={destinoFinal}
+                onChangeText={(text) => setMarca(text)}
+                value={marca}
             />
         <Separator/>
             <TextInput
                 placeholder='Preço (R$)'
-                left={<TextInput.Icon icon="currency-usd" />}
+                left={<TextInput.Icon icon="sack" />}
                 style={styles.input}
-                onChangeText={(text) => setValor(text)}
-                value={valor}
+                onChangeText={(text) => setPreco(text)}
+                value={preco}
             />
-        </View>
+        <Separator/>
+            <TextInput
+                placeholder='Cor'
+                left={<TextInput.Icon icon="format-color-fill" />}
+                style={styles.input}
+                onChangeText={(text) => setCor(text)}
+                value={cor}
+            />
+          <View style={styles.button}> 
+             <Button 
+                onPress={insertUpdate} 
+                title="Adicionar" 
+                color="#3ea6f2" 
+            /> 
+          </View>             
+         </View>
     );
 }
 

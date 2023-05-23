@@ -56,8 +56,8 @@ export default function Menu() {
                             case 'Listar':
                                 iconName = 'list';
                                 break;
-                            case 'Passagem Aérea':
-                                iconName = 'plane';
+                            case 'Adicionar':
+                                iconName = 'check';
                                 break;
                             case 'Ler API':
                                 iconName = 'bell';
@@ -81,7 +81,7 @@ export default function Menu() {
                 <Tab.Screen name="Home" component={HomeScreen} />
                 <Tab.Screen name="Listar" component={ListScreen} />
                 <Tab.Screen
-                    name="Passagem Aérea"
+                    name="Adicionar"
                     component={ProdutosScreen}
                 />
                 <Tab.Screen name="Ler API" component={NotificationsScreen} />
