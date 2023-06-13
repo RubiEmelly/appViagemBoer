@@ -2,6 +2,8 @@ import {View, Text, StyleSheet, Button, TouchableOpacity, Keyboard, FlatList, Ac
 import { TextInput } from 'react-native-paper';
 import React, { useState, useEffect, useRef } from 'react'; 
 import firebase from '../../services/connectioFirebase';
+import Listagem from './listagem';
+
 
 const Separator = () => { 
     return <View style={styles.separator} />; 
@@ -14,10 +16,36 @@ export default function GerenciarProduto() {
     const [preco, setPreco] = useState('');
     const [cor, setCor] = useState('');
     const [key, setKey] = useState('');
+    const [produtos, setProdutos] = useState([]); 
+    const [loading, setLoading] = useState(true); 
+    const inputRef = useRef(null); 
 
+    useEffect(() => { 
+
+        async function search() { 
+
+          await firebase.database().ref('produtos').on('value', (snapshot) => { 
+            setProdutos([]); 
+
+            snapshot.forEach((chilItem) => { 
+              let data = { 
+                //de acordo com a chave de cada item busca os valores 
+                //cadastrados na relação e atribui nos dados 
+                key: chilItem.key, 
+                nome: chilItem.val().nome, 
+                marca: chilItem.val().marca, 
+                preco: chilItem.val().preco, 
+                cor: chilItem.val().cor, 
+              }; 
+              setProdutos(oldArray => [...oldArray, data].reverse()); 
+            }) 
+            setLoading(false); 
+          }) 
+        } 
+        search(); 
+      }, []); 
 
 //implementação dos métodos update ou insert 
-
 async function insertUpdate() { 
     //editar dados 
     if (
@@ -63,6 +91,26 @@ function clearFields(){
     setCor('');
 }
 
+//função para excluir um item  
+function handleDelete(key) { 
+    firebase.database().ref('produtos').child(key).remove() 
+      .then(() => { 
+        //todos os itens que forem diferentes daquele que foi deletado 
+        //serão atribuidos no array 
+        const findProdutos = produtos.filter(item => item.key !== key) 
+        setProdutos(findProdutos) 
+      }) 
+  } 
+
+//função para editar  
+  function handleEdit(data) { 
+      setKey(data.key), 
+      setNome(data.nome), 
+      setMarca(data.marca), 
+      setPreco(data.preco), 
+      setCor(data.cor) 
+  } 
+
     return (
 
         <View style={styles.container}>
@@ -74,6 +122,7 @@ function clearFields(){
                 style={styles.input}
                 onChangeText={(text) => setNome(text)}
                 value={nome}
+                ref={inputRef} 
             />
         <Separator/>
             <TextInput
@@ -82,6 +131,7 @@ function clearFields(){
                 style={styles.input}
                 onChangeText={(text) => setMarca(text)}
                 value={marca}
+                ref={inputRef} 
             />
         <Separator/>
             <TextInput
@@ -90,6 +140,7 @@ function clearFields(){
                 style={styles.input}
                 onChangeText={(text) => setPreco(text)}
                 value={preco}
+                ref={inputRef} 
             />
         <Separator/>
             <TextInput
@@ -98,14 +149,35 @@ function clearFields(){
                 style={styles.input}
                 onChangeText={(text) => setCor(text)}
                 value={cor}
+                ref={inputRef} 
             />
           <View style={styles.button}> 
              <Button 
                 onPress={insertUpdate} 
-                title="Adicionar" 
+                title="Adicionar Produto" 
                 color="#3ea6f2" 
             /> 
-          </View>             
+          </View> 
+
+          <View> 
+          <Text style={styles.listar}>Listagem de Produtos</Text> 
+          </View> 
+
+        {loading ? 
+          ( 
+            <ActivityIndicator color="#121212" size={45} /> 
+        ) : 
+        ( 
+            <FlatList 
+            keyExtractor={item => item.key} 
+            data={produtos} 
+            renderItem={({ item }) => ( 
+                <Listagem data={item} deleteItem={handleDelete} 
+                    editItem={handleEdit} /> 
+            )} 
+        /> 
+    ) 
+} 
          </View>
     );
 }

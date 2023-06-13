@@ -8,6 +8,7 @@ import 'firebase/compat/database';
 let firebaseConfig = {
     apiKey: "AIzaSyCYj9Iq-pqHbRN6pb79SpL8ifNEkpi0V2E",
     authDomain: "dbboerviagem.firebaseapp.com",
+    databaseURL: "https://dbboerviagem-default-rtdb.firebaseio.com",
     projectId: "dbboerviagem",
     storageBucket: "dbboerviagem.appspot.com",
     messagingSenderId: "244580227384",
